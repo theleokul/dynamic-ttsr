@@ -10,7 +10,7 @@ import kornia.augmentation as KA
 class RandomRotation90(nn.Module):
     """Rotate by one of the given angles."""
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         if random.random() < 0.5:
             x = x.transpose(-1, -2)
         return x

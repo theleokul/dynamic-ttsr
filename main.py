@@ -12,16 +12,18 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import torch.utils.data as data
 import torchvision as tv
 import torchvision.transforms as tv_transforms
-import kornia as K
-import kornia.augmentation as KA
+# import kornia as K
+# import kornia.augmentation as KA
 import pytorch_lightning as pl
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(DIR_PATH)
 import utils
-import lit_composer
+# import lit_composer
+import composers
 
 
 warnings.filterwarnings('ignore')  # To shut down some useless shit pytorch sometimes spits out
@@ -50,26 +52,28 @@ if __name__ == "__main__":
     model_checkpoint_callback__save_top_k = config.get('model_checkpoint_callback__save_top_k', 1)
     model_checkpoint_callback__mode = config.get('model_checkpoint_callback__mode', 'min')
 
+    Composer = getattr(composers, config.get('composer'))
     if model_checkpoint is not None:
-        lit_model = lit_composer.LitComposer.load_from_checkpoint(model_checkpoint, **config)
+        lit_model = Composer.load_from_checkpoint(model_checkpoint, **config)
     else:
-        lit_model = lit_composer.LitComposer(**config)
+        lit_model = Composer(**config)
+
+    baseline_checkpoint = config.get('baseline_checkpoint', None)
+    if baseline_checkpoint is not None:
+        BComposer = getattr(composers, config.get('baseline_composer'))
+        baseline_lit_model = BComposer.load_from_checkpoint(baseline_checkpoint)
+        lit_model.load_baseline(baseline_lit_model)
+        del baseline_lit_model
     
     # Form logger and checkpoint callback
     if 'train' in modes:
-        logger = plt.loggers.TensorBoardLogger(save_dir=log_save_dir, name='')
+        logger = pl.loggers.TensorBoardLogger(save_dir=log_save_dir, name='')
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             monitor=model_checkpoint_callback__monitor[0]
             , save_top_k=model_checkpoint_callback__save_top_k
             , mode=model_checkpoint_callback__mode
-            , save_weights_only=True
-            , filepath=str(
-                pathlib.Path(
-                    logger.log_dir
-                    , 'checkpoint'
-                    , '{epoch}-' + '-'.join(['{' + m + ':.4f' for m in model_checkpoint_callback__monitor])
-                )
-            )
+            , save_weights_only=False  # It allows to checkpoint generator, discriminator and all stuff
+            , filename='{epoch}-' + '-'.join(['{' + m + ':.4f' + '}' for m in model_checkpoint_callback__monitor])
         )
         trainer = pl.Trainer(
             **trainer__kwargs
@@ -77,16 +81,50 @@ if __name__ == "__main__":
             , logger=logger
             , gpus=len(gpus)
         )
-        trainer.fit(lit_model)
+
+        train_dataset = lit_model._parse_dataset(
+            config.get('train_dataset')
+            , *config.get('train_dataset__args', [])
+            , **config.get('train_dataset__kwargs', {})
+        )
+        train_data_loader = data.DataLoader(
+            train_dataset
+            , batch_size=config.get('batch_size', 1)
+            , shuffle=True
+            , num_workers=config.get('train_num_workers', 0)
+        )
+        val_dataset = lit_model._parse_dataset(
+            config.get('val_dataset')
+            , *config.get('val_dataset__args', [])
+            , **config.get('val_dataset__kwargs', {})
+        )
+        val_data_loader = data.DataLoader(
+            val_dataset
+            , batch_size=1
+            , num_workers=config.get('val_num_workers', 0)
+        )        
+        trainer.fit(lit_model, train_data_loader, val_data_loader)
     elif 'test' in modes:
         lit_model.eval()
         trainer = pl.Trainer(
             **trainer__kwargs
             , gpus=len(gpus)
         )
-        trainer.test(lit_model, verbose=True)
+
+        test_dataset = lit_model._parse_dataset(
+            config.get('dataset')
+            , *config.get('test_dataset__args', [])
+            , **config.get('test_dataset__kwargs', {})
+        )
+        test_data_loader = data.DataLoader(
+            test_dataset
+            , batch_size=config.get('batch_size', 1)
+            , num_workers=config.get('test_num_workers', 0)
+        )
+
+        trainer.test(lit_model, test_data_loader)
     elif 'predict' in modes:
-        lit_model.freeze()
+        lit_model.eval()
         os.makedirs(output_dirpath, exist_ok=True)
 
         # Deploy model on the appropriate device
@@ -94,8 +132,19 @@ if __name__ == "__main__":
         lit_model.to(device)
 
         to_PIL_transformer = tv_transforms.TOPILImage()
-        dataloader = lit_model.test_dataloader()
-        for i, (x, y) in tqdm(enumerate(dataloader), total=len(dataloader)):
+
+        test_dataset = lit_model._parse_dataset(
+            config.get('dataset')
+            , *config.get('test_dataset__args', [])
+            , **config.get('test_dataset__kwargs', {})
+        )
+        test_data_loader = data.DataLoader(
+            test_dataset
+            , batch_size=config.get('batch_size', 1)
+            , num_workers=config.get('test_num_workers', 0)
+        )
+
+        for i, (x, y) in tqdm(enumerate(test_data_loader), total=len(test_data_loader)):
             x = x.to(device)
             y = y.to(device)
 
@@ -103,6 +152,14 @@ if __name__ == "__main__":
             if not isinstance(y_pred, torch.Tensor):
                 # In case model spits out several objects
                 y_pred = y_pred[0]
+
+            # Denormalize
+            x = (x + 1.) * 127.5
+            x = x.clamp(0., 255.).dtype(torch.uint8)
+            y_pred = (y_pred + 1.) * 127.5
+            y_pred = y_pred.clamp(0., 255.).dtype(torch.uint8)
+            y = (y + 1.) * 127.5
+            y = y.clamp(0., 255.).dtype(torch.uint8)
 
             for j, (x, yp, y) in enumerate(zip(x, y_pred, y)):
                 k = i * lit_model.batch_size + j
