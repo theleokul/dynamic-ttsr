@@ -1,19 +1,19 @@
 # Main metainfo
 log_save_dir: './logs_full_ttsr_cufed5'
 
-model_checkpoint: null
 model_checkpoint_callback__monitor: ['avg_val_psnr', 'avg_val_ssim']
 model_checkpoint_callback__save_top_k: 5
 model_checkpoint_callback__mode: 'max'
 baseline_composer: TTSRLitComposer
 baseline_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_ttsr_cufed5/version_0/checkpoints/epoch=1-avg_val_psnr=23.6239-avg_val_ssim=0.6662.ckpt'
+# model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_3/checkpoints/epoch=4-avg_val_psnr=22.8431-avg_val_ssim=0.6491.ckpt'
 composer: FullTTSRLitComposer
 
 trainer__kwargs:
-  max_epochs: 50
+  max_epochs: 48
   track_grad_norm: 2
   # gradient_clip_val: .5
-  # precision: 16
+  precision: 16
   accelerator: 'dp'
   # fast_dev_run: True
 

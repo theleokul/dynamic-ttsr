@@ -21,9 +21,9 @@ class TTSR(nn.Module):
 
     def forward(self, lr=None, lrsr=None, ref=None, refsr=None, sr=None):
         if (type(sr) != type(None)):
-            self.LTE.requires_grad_(False)
-            sr_lv1, sr_lv2, sr_lv3 = self.LTE((sr + 1.) / 2.)
-            self.LTE.requires_grad_(True)
+            # self.LTE.requires_grad_(False)
+            self.LTE_copy.load_state_dict(self.LTE.state_dict())
+            sr_lv1, sr_lv2, sr_lv3 = self.LTE_copy((sr + 1.) / 2.)
             return sr_lv1, sr_lv2, sr_lv3
 
         _, _, lrsr_lv3  = self.LTE((lrsr.detach() + 1.) / 2.)

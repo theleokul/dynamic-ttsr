@@ -74,8 +74,13 @@ class FullTTSRLitComposer(TTSRLitComposer):
                 fake = sr
                 d_fake = self.discriminator(fake)
                 loss += self.loss['adv'](d_fake, discriminator=False) * self.loss['coef_adv']
-            self.log('loss_g', loss, sync_dist=True, prog_bar=True)
-        else:  # Discriminator
+            self.log('loss_g', loss, sync_dist=True)
+
+            return {
+                'loss': loss
+                , 'loss_g': loss
+            }
+        elif optimizer_idx == 1:  # Discriminator
             fake, real = sr, hr
             fake_detach = fake.detach()
             d_fake = self.discriminator(fake_detach)
@@ -86,6 +91,9 @@ class FullTTSRLitComposer(TTSRLitComposer):
             hat.requires_grad = True
             d_hat = self.discriminator(hat)
             loss = self.loss['adv'](d_fake, d_real, d_hat, fake, real, hat, discriminator=True)
-            self.log('loss_d', loss, sync_dist=True, prog_bar=True)
+            self.log('loss_d', loss, sync_dist=True)
 
-        return loss
+            return {
+                'loss': loss
+                , 'loss_d': loss
+            }
