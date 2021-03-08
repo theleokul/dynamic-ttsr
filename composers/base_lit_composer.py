@@ -209,7 +209,15 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
         raise NotImplementedError()
 
     def training_epoch_end(self, outputs):
-        output = {f'avg_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
+        keys = set()
+        # NOTE: Check keys only in first 5 outputs by default (Override if more needed)
+        for o in outputs[:5]:
+            keys |= set(o.keys())
+        output = {
+            f'avg_{k}': \
+            torch.as_tensor([o[k] for o in outputs if o.get(k, None) is not None]).mean() \
+            for k in keys
+        }
         self.log_dict(output, prog_bar=True)
 
     def validation_epoch_end(self, outputs):

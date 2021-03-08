@@ -11,10 +11,11 @@ composer: FullTTSRLitComposer
 
 trainer__kwargs:
   max_epochs: 48
-  track_grad_norm: 2
+  # track_grad_norm: 2
   # gradient_clip_val: .5
-  precision: 16
+  # precision: 16
   accelerator: 'dp'
+  # limit_train_batches: 0.1
   # fast_dev_run: True
 
 # Model

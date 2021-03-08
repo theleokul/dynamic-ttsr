@@ -75,11 +75,7 @@ class FullTTSRLitComposer(TTSRLitComposer):
                 d_fake = self.discriminator(fake)
                 loss += self.loss['adv'](d_fake, discriminator=False) * self.loss['coef_adv']
             self.log('loss_g', loss, sync_dist=True)
-
-            return {
-                'loss': loss
-                , 'loss_g': loss
-            }
+            output = {'loss': loss, 'loss_g': loss.detach()}
         elif optimizer_idx == 1:  # Discriminator
             fake, real = sr, hr
             fake_detach = fake.detach()
@@ -92,8 +88,13 @@ class FullTTSRLitComposer(TTSRLitComposer):
             d_hat = self.discriminator(hat)
             loss = self.loss['adv'](d_fake, d_real, d_hat, fake, real, hat, discriminator=True)
             self.log('loss_d', loss, sync_dist=True)
+            output = {'loss': loss, 'loss_d': loss.detach()}
 
-            return {
-                'loss': loss
-                , 'loss_d': loss
-            }
+        return output
+
+        def training_epoch_end(self, outputs):
+            keys = ['loss_d', 'loss_g']
+            output = {}
+
+            output = {f'avg_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
+            self.log_dict(output, prog_bar=True)

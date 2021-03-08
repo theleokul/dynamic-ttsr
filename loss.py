@@ -70,7 +70,9 @@ class WGANGPAdversarialLoss(nn.Module):
             loss_d = (d_fake - d_real).mean()
             gradients = torch.autograd.grad(
                 outputs=d_hat.sum(), inputs=hat,
-                retain_graph=True, create_graph=True, only_inputs=True
+                retain_graph=True
+                , create_graph=True
+                , only_inputs=True
             )[0]
             gradients = gradients.view(gradients.size(0), -1)
             gradient_norm = gradients.norm(2, dim=1)
