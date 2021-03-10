@@ -159,7 +159,7 @@ if __name__ == "__main__":
             sr, S, T_lv3, T_lv2, T_lv1 = lit_model(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
 
             x = lr
-            y_pred = sr
+            y_pred = sr.detach()
             y = hr
 
             # Denormalize
