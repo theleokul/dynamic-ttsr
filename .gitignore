@@ -2,3 +2,4 @@
 *.ipynb
 logs_*
 __pycache__
+*output*

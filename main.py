@@ -29,7 +29,7 @@ import composers
 warnings.filterwarnings('ignore')  # To shut down some useless shit pytorch sometimes spits out
 parser = argparse.ArgumentParser(description='Main entry to train/evaluate models.')
 parser.add_argument('--config', nargs='+', type=str, required=True)
-parser.add_argument('-g', '--gpus', nargs='+', type=int, default=[0], help='GPUs')
+parser.add_argument('-g', '--gpus', nargs='+', type=int, default=[], help='GPUs')
 
 args = parser.parse_args()
 config = {}
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         )
 
         test_dataset = lit_model._parse_dataset(
-            config.get('dataset')
+            config.get('test_dataset')
             , *config.get('test_dataset__args', [])
             , **config.get('test_dataset__kwargs', {})
         )
@@ -131,10 +131,10 @@ if __name__ == "__main__":
         device = torch.device('cuda') if len(gpus) >= 1 else torch.device('cpu')
         lit_model.to(device)
 
-        to_PIL_transformer = tv_transforms.TOPILImage()
+        to_PIL_transformer = tv_transforms.ToPILImage()
 
         test_dataset = lit_model._parse_dataset(
-            config.get('dataset')
+            config.get('test_dataset')
             , *config.get('test_dataset__args', [])
             , **config.get('test_dataset__kwargs', {})
         )
@@ -144,27 +144,33 @@ if __name__ == "__main__":
             , num_workers=config.get('test_num_workers', 0)
         )
 
-        for i, (x, y) in tqdm(enumerate(test_data_loader), total=len(test_data_loader)):
-            x = x.to(device)
-            y = y.to(device)
+        for i, batch in tqdm(enumerate(test_data_loader), total=len(test_data_loader)):
+            lr = batch['LR'].to(device)
+            lr_sr = batch['LR_sr'].to(device)
+            hr = batch['HR'].to(device)
+            ref = batch['Ref'].to(device)
+            ref_sr = batch['Ref_sr'].to(device)
+            sr, S, T_lv3, T_lv2, T_lv1 = lit_model(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
 
-            y_pred = lit_model(x)
-            if not isinstance(y_pred, torch.Tensor):
-                # In case model spits out several objects
-                y_pred = y_pred[0]
+            x = lr
+            y_pred = sr
+            y = hr
 
             # Denormalize
             x = (x + 1.) * 127.5
-            x = x.clamp(0., 255.).dtype(torch.uint8)
+            x = x.clamp(0., 255.).type(torch.uint8)
             y_pred = (y_pred + 1.) * 127.5
-            y_pred = y_pred.clamp(0., 255.).dtype(torch.uint8)
+            y_pred = y_pred.clamp(0., 255.).type(torch.uint8)
             y = (y + 1.) * 127.5
-            y = y.clamp(0., 255.).dtype(torch.uint8)
+            y = y.clamp(0., 255.).type(torch.uint8)
+            ref = (ref + 1.) * 127.5
+            ref = ref.clamp(0., 255.).type(torch.uint8)
 
-            for j, (x, yp, y) in enumerate(zip(x, y_pred, y)):
+            for j, (x, yp, y, ref) in enumerate(zip(x, y_pred, y, ref)):
                 k = i * lit_model.batch_size + j
                 to_PIL_transformer(x).save(os.path.join(output_dirpath, f'{k}_input.png'))
                 to_PIL_transformer(yp).save(os.path.join(output_dirpath, f'{k}_pred.png'))
                 to_PIL_transformer(y).save(os.path.join(output_dirpath, f'{k}_gt.png'))
+                to_PIL_transformer(ref).save(os.path.join(output_dirpath, f'{k}_ref.png'))
     else:
         raise NotImplementedError()

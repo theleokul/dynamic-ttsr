@@ -29,7 +29,7 @@ class PerceptualLoss(nn.Module):
 
 
 class TPerceptualLoss(nn.Module):
-    def __init__(self, use_S=True, type='l2'):
+    def __init__(self, use_S=False, type='l2'):
         super(TPerceptualLoss, self).__init__()
         self.use_S = use_S
         self.type = type

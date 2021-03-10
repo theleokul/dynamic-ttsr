@@ -1,0 +1,9 @@
+model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_20/checkpoints/epoch=1-avg_val_psnr=25.0534-avg_val_ssim=0.7462.ckpt'
+composer: FullTTSRLitComposer
+output_dir: 'orig_output'
+# modes: test
+modes: predict
+
+test_dataset: 'CufedTestDataset'
+test_dataset__kwargs:
+  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/test'

@@ -9,7 +9,7 @@ composer: TTSRLitComposer
 
 trainer__kwargs:
   max_epochs: 2
-  track_grad_norm: 2
+  # track_grad_norm: 2
   # gradient_clip_val: .5
   # precision: 16
   accelerator: 'dp'
