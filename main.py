@@ -179,7 +179,7 @@ if __name__ == "__main__":
             # for j, (x, yp, y, ref) in enumerate(zip(x, y_pred, y, ref)):
             # k = i * lit_model.batch_size + j
             k = i
-            imageio.imsave(save_path, sr_save)
+            # imageio.imsave(save_path, sr_save)
             imageio.imsave(os.path.join(output_dirpath, f'{k}_input.png'), x)
             imageio.imsave(os.path.join(output_dirpath, f'{k}_pred.png'), y_pred)
             imageio.imsave(os.path.join(output_dirpath, f'{k}_gt.png'), y)
