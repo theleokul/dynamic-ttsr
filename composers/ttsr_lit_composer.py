@@ -194,9 +194,9 @@ class FullTTSRLitComposer(TTSRLitComposer):
 
         return output
 
-        def training_epoch_end(self, outputs):
-            keys = ['g', 'r', 'p', 'tp', 'a', 'd']
-            output = {}
+    def training_epoch_end(self, outputs):
+        keys = ['g', 'r', 'p', 'tp', 'a', 'd']
+        output = {}
 
-            output = {f'a_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
-            self.log_dict(output, prog_bar=True)
+        output = {f'a_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
+        self.log_dict(output, prog_bar=True)
