@@ -1,0 +1,18 @@
+model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_20/checkpoints/epoch=1-avg_val_psnr=25.0534-avg_val_ssim=0.7462.ckpt'
+# model_pt_checkpoint: './drive/MyDrive/skoltech/train_ttsr_orig/model/model_00050.pt'
+composer: FullTTSRLitComposer
+output_dir: './orig_output'
+# modes: test
+modes: predict
+
+# Model
+model: 'TTSR'
+model__kwargs:
+  n_feats: 64
+  num_res_blocks: 16+16+8+4
+  res_scale: 1.
+
+test_dataset: 'CufedTestDataset'
+test_dataset__kwargs:
+  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/test'
+  # dataset_dirpath: './CUFED/test'
