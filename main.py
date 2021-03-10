@@ -7,6 +7,7 @@ import argparse
 import warnings
 
 from tqdm import tqdm
+import numpy as np
 import cv2 as cv
 import torch
 import torch.nn as nn
@@ -18,6 +19,7 @@ import torchvision.transforms as tv_transforms
 # import kornia as K
 # import kornia.augmentation as KA
 import pytorch_lightning as pl
+import imageio
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(DIR_PATH)
@@ -144,7 +146,7 @@ if __name__ == "__main__":
         )
         test_data_loader = data.DataLoader(
             test_dataset
-            , batch_size=config.get('batch_size', 1)
+            , batch_size=1
             , num_workers=config.get('test_num_workers', 0)
         )
 
@@ -162,19 +164,25 @@ if __name__ == "__main__":
 
             # Denormalize
             x = (x + 1.) * 127.5
-            x = x.clamp(0., 255.).type(torch.uint8)
+            # x = x.clamp(0., 255.).type(torch.uint8)
+            x = np.transpose(x.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
             y_pred = (y_pred + 1.) * 127.5
-            y_pred = y_pred.clamp(0., 255.).type(torch.uint8)
+            # y_pred = y_pred.clamp(0., 255.).type(torch.uint8)
+            y_pred = np.transpose(y_pred.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
             y = (y + 1.) * 127.5
-            y = y.clamp(0., 255.).type(torch.uint8)
+            y = np.transpose(y.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
+            # y = y.clamp(0., 255.).type(torch.uint8)
             ref = (ref + 1.) * 127.5
-            ref = ref.clamp(0., 255.).type(torch.uint8)
+            ref = np.transpose(ref.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
+            # ref = ref.clamp(0., 255.).type(torch.uint8)
 
-            for j, (x, yp, y, ref) in enumerate(zip(x, y_pred, y, ref)):
-                k = i * lit_model.batch_size + j
-                to_PIL_transformer(x).save(os.path.join(output_dirpath, f'{k}_input.png'))
-                to_PIL_transformer(yp).save(os.path.join(output_dirpath, f'{k}_pred.png'))
-                to_PIL_transformer(y).save(os.path.join(output_dirpath, f'{k}_gt.png'))
-                to_PIL_transformer(ref).save(os.path.join(output_dirpath, f'{k}_ref.png'))
+            # for j, (x, yp, y, ref) in enumerate(zip(x, y_pred, y, ref)):
+            # k = i * lit_model.batch_size + j
+            k = i
+            imageio.imsave(save_path, sr_save)
+            imageio.imsave(os.path.join(output_dirpath, f'{k}_input.png'), x)
+            imageio.imsave(os.path.join(output_dirpath, f'{k}_pred.png'), y_pred)
+            imageio.imsave(os.path.join(output_dirpath, f'{k}_gt.png'), y)
+            imageio.imsave(os.path.join(output_dirpath, f'{k}_ref.png'), ref)
     else:
         raise NotImplementedError()
