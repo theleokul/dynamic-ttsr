@@ -87,10 +87,6 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
         if isinstance(lr, dict):
             parameters = []
             for k in lr:
-                # params = filter(
-                #     lambda p: p.requires_grad
-                #     , getattr(model.module, k).parameters()
-                # )
                 parameters.append({
                     'params': filter(lambda p: p.requires_grad, getattr(model, k).parameters())
                     , 'lr': lr[k]

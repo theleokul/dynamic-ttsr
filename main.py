@@ -69,6 +69,7 @@ if __name__ == "__main__":
     
     baseline_pt_checkpoint = config.get('baseline_pt_checkpoint', None)
     if baseline_pt_checkpoint is not None:
+        print(f'Loaded: {baseline_pt_checkpoint}')
         lit_model.load_pt_baseline(baseline_pt_checkpoint)
     
     # Form logger and checkpoint callback
@@ -156,10 +157,12 @@ if __name__ == "__main__":
             hr = batch['HR'].to(device)
             ref = batch['Ref'].to(device)
             ref_sr = batch['Ref_sr'].to(device)
-            sr, S, T_lv3, T_lv2, T_lv1 = lit_model(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
+
+            with torch.no_grad():
+                sr, _, _, _, _ = lit_model(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
 
             x = lr
-            y_pred = sr.detach()
+            y_pred = sr
             y = hr
 
             # Denormalize
