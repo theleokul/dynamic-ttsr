@@ -167,7 +167,7 @@ class FullTTSRLitComposer(TTSRLitComposer):
             
             output = {
                 'loss': loss
-                , 'g', loss.detach()
+                , 'g': loss.detach()
                 , 'r': loss_rec.detach()
                 , 'p': loss_per.detach()
                 , 'tp': loss_tper.detach()
