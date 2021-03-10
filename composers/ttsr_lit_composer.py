@@ -177,14 +177,18 @@ class FullTTSRLitComposer(TTSRLitComposer):
         elif optimizer_idx == 1:  # Discriminator
             fake, real = sr, hr
             fake_detach = fake.detach()
-            d_fake = self.discriminator(fake_detach)
-            d_real = self.discriminator(real)
-            epsilon = torch.rand(real.size(0), 1, 1, 1).to(d_fake.device)
-            epsilon = epsilon.expand(real.size())
-            hat = fake_detach.mul(1 - epsilon) + real.mul(epsilon)
-            hat.requires_grad = True
-            d_hat = self.discriminator(hat)
-            loss = self.loss['adv'](d_fake, d_real, d_hat, fake, real, hat, discriminator=True)
+
+            loss = 0
+            for _ in range(2):
+                d_fake = self.discriminator(fake_detach)
+                d_real = self.discriminator(real)
+                epsilon = torch.rand(real.size(0), 1, 1, 1).to(d_fake.device)
+                epsilon = epsilon.expand(real.size())
+                hat = fake_detach.mul(1 - epsilon) + real.mul(epsilon)
+                hat.requires_grad = True
+                d_hat = self.discriminator(hat)
+                loss += self.loss['adv'](d_fake, d_real, d_hat, fake, real, hat, discriminator=True)
+
             output = {'loss': loss, 'd': loss.detach()}
 
         return output

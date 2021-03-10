@@ -57,7 +57,7 @@ discriminator__optimizer__kwargs:
   eps: !!float 1e-8
 
 discriminator__lr_scheduler: null
-discriminator__frequency: 2
+# discriminator__frequency: 2
 
 # Datasets
 train_dataset: 'CufedTrainDataset'
