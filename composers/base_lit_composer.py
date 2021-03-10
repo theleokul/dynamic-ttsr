@@ -211,14 +211,15 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
     def training_epoch_end(self, outputs):
         keys = set()
         # NOTE: Check keys only in first 5 outputs by default (Override if more needed)
-        for o in outputs[:5]:
+        for o in outputs[:2]:
             keys |= set(o.keys())
-        output = {
+        
+        to_log = {
             f'a_{k}': \
             torch.as_tensor([o[k] for o in outputs if o.get(k, None) is not None]).mean() \
             for k in keys
         }
-        self.log_dict(output, prog_bar=True)
+        self.log_dict(to_log, prog_bar=True)
 
     def validation_epoch_end(self, outputs):
         self.training_epoch_end(outputs)

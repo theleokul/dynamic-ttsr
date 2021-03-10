@@ -163,6 +163,7 @@ class FullTTSRLitComposer(TTSRLitComposer):
                 fake = sr
                 d_fake = self.discriminator(fake)
                 loss_adv = self.loss['adv'](d_fake, discriminator=False)
+
             loss = loss_rec * self.loss['coef_rec'] + loss_per * self.loss['coef_per'] + loss_tper * self.loss['coef_tper'] + loss_adv * self.loss['coef_adv']
             
             output = {
@@ -193,9 +194,9 @@ class FullTTSRLitComposer(TTSRLitComposer):
 
         return output
 
-        # def training_epoch_end(self, outputs):
-        #     keys = ['g', 'r', 'p', 'tp', 'a', 'd']
-        #     output = {}
+        def training_epoch_end(self, outputs):
+            keys = ['g', 'r', 'p', 'tp', 'a', 'd']
+            output = {}
 
-        #     output = {f'a_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
-        #     self.log_dict(output, prog_bar=True)
+            output = {f'a_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
+            self.log_dict(output, prog_bar=True)
