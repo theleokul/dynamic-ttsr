@@ -1,19 +1,19 @@
 # Main metainfo
-log_save_dir: './logs_full_ttsr_cufed5'
+log_save_dir: './drive/MyDrive/skoltech/train_suite_ttsr_orig'
 
-model_checkpoint_callback__monitor: ['avg_val_psnr', 'avg_val_ssim']
+model_checkpoint_callback__monitor: ['a_psnr', 'a_ssim']
 model_checkpoint_callback__save_top_k: 5
 model_checkpoint_callback__mode: 'max'
-# baseline_composer: TTSRLitComposer
-# baseline_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_ttsr_cufed5/version_0/checkpoints/epoch=1-avg_val_psnr=23.6239-avg_val_ssim=0.6662.ckpt'
+baseline_composer: TTSRLitComposer
+baseline_checkpoint: './drive/MyDrive/skoltech/train_suite_ttsr_orig/version_0/checkpoints/epoch=1-avg_val_psnr=25.6136-avg_val_ssim=0.7534.ckpt'
 # model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_16/checkpoints/epoch=7-avg_val_psnr=22.8162-avg_val_ssim=0.6502.ckpt'
 # model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_17/checkpoints/epoch=7-avg_val_psnr=24.6411-avg_val_ssim=0.7335.ckpt'
 # model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_18/checkpoints/epoch=7-avg_val_psnr=24.8812-avg_val_ssim=0.7421.ckpt'
-model_checkpoint: '/trinity/home/l.kulikov/projects/train-suite/logs_full_ttsr_cufed5/version_19/checkpoints/epoch=5-avg_val_psnr=25.0431-avg_val_ssim=0.7482.ckpt'
+# model_checkpoint: './drive/MyDrive/skoltech/train_suite_ttsr_orig'
 composer: FullTTSRLitComposer
 
 trainer__kwargs:
-  max_epochs: 50 #20 # 26 # 34  # 41 48
+  max_epochs: 48 #20 # 26 # 34  # 41 48
   # track_grad_norm: 2
   # gradient_clip_val: .5
   # precision: 16
@@ -63,9 +63,9 @@ discriminator__frequency: 2
 train_dataset: 'CufedTrainDataset'
 train_num_workers: 4
 train_dataset__kwargs:
-  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/train'
+  dataset_dirpath: './CUFED/train'
 
 val_dataset: 'CufedTestDataset'
 val_num_workers: 2
 val_dataset__kwargs:
-  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/test'
+  dataset_dirpath: './CUFED/test'

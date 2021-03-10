@@ -108,7 +108,6 @@ class TTSRLitComposer(BaseLitComposer):
 
         sr, S, T_lv3, T_lv2, T_lv1 = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
         loss = self.loss(sr, hr)
-        self.log('loss_g', loss, sync_dist=True)
 
         return loss
 
@@ -127,10 +126,9 @@ class TTSRLitComposer(BaseLitComposer):
         psnr_loss, ssim_loss = calc_psnr_and_ssim(sr.detach(), hr.detach())
 
         output = {
-            'val_psnr': psnr_loss
-            , 'val_ssim': ssim_loss
+            'psnr': psnr_loss
+            , 'ssim': ssim_loss
         }
-        self.log_dict(output, sync_dist=True)
 
         return output
 
@@ -152,21 +150,30 @@ class FullTTSRLitComposer(TTSRLitComposer):
         sr, S, T_lv3, T_lv2, T_lv1 = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
 
         if optimizer_idx == 0:  # Generator
-            loss = self.loss['rec'](sr, hr) * self.loss['coef_rec']
+            loss_rec = self.loss['rec'](sr, hr)
             if 'per' in self.loss.losses:
                 sr_relu5_1 = self.vgg19((sr + 1.) / 2.)
                 with torch.no_grad():
                     hr_relu5_1 = self.vgg19((hr.detach() + 1.) / 2.)
-                loss += self.loss['per'](sr_relu5_1, hr_relu5_1) * self.loss['coef_per']
+                loss_per = self.loss['per'](sr_relu5_1, hr_relu5_1)
             if 'tper' in self.loss.losses:
                 sr_lv1, sr_lv2, sr_lv3 = self(sr=sr)
-                loss += self.loss['tper'](sr_lv3, sr_lv2, sr_lv1, S, T_lv3, T_lv2, T_lv1) * self.loss['coef_tper']
+                loss_tper = self.loss['tper'](sr_lv3, sr_lv2, sr_lv1, S, T_lv3, T_lv2, T_lv1)
             if 'adv' in self.loss.losses:
                 fake = sr
                 d_fake = self.discriminator(fake)
-                loss += self.loss['adv'](d_fake, discriminator=False) * self.loss['coef_adv']
-            self.log('loss_g', loss, sync_dist=True)
-            output = {'loss': loss, 'loss_g': loss.detach()}
+                loss_adv = self.loss['adv'](d_fake, discriminator=False)
+            loss = loss_rec * self.loss['coef_rec'] + loss_per * self.loss['coef_per'] + loss_tper * self.loss['coef_tper'] + loss_adv * self.loss['coef_adv']
+            
+            output = {
+                'loss': loss
+                , 'g', loss.detach()
+                , 'r': loss_rec.detach()
+                , 'p': loss_per.detach()
+                , 'tp': loss_tper.detach()
+                , 'a': loss_adv.detach()
+            }
+
         elif optimizer_idx == 1:  # Discriminator
             fake, real = sr, hr
             fake_detach = fake.detach()
@@ -178,14 +185,13 @@ class FullTTSRLitComposer(TTSRLitComposer):
             hat.requires_grad = True
             d_hat = self.discriminator(hat)
             loss = self.loss['adv'](d_fake, d_real, d_hat, fake, real, hat, discriminator=True)
-            self.log('loss_d', loss, sync_dist=True)
-            output = {'loss': loss, 'loss_d': loss.detach()}
+            output = {'loss': loss, 'd': loss.detach()}
 
         return output
 
-        def training_epoch_end(self, outputs):
-            keys = ['loss_d', 'loss_g']
-            output = {}
+        # def training_epoch_end(self, outputs):
+        #     keys = ['g', 'r', 'p', 'tp', 'a', 'd']
+        #     output = {}
 
-            output = {f'avg_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
-            self.log_dict(output, prog_bar=True)
+        #     output = {f'a_{k}': torch.as_tensor([o[k] for o in outputs]).mean() for k in outputs[0].keys()}
+        #     self.log_dict(output, prog_bar=True)
