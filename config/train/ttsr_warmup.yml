@@ -1,5 +1,5 @@
 # Main metainfo
-log_save_dir: './logs_ttsr_cufed5'
+log_save_dir: './drive/MyDrive/skoltech/train_suite_ttsr_orig'
 
 model_checkpoint: null
 model_checkpoint_callback__monitor: ['avg_val_psnr', 'avg_val_ssim']
@@ -43,9 +43,9 @@ lr_scheduler__kwargs:
 train_dataset: 'CufedTrainDataset'
 train_num_workers: 4
 train_dataset__kwargs:
-  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/train'
+  dataset_dirpath: './CUFED/train'
 
 val_dataset: 'CufedTestDataset'
 val_num_workers: 2
 val_dataset__kwargs:
-  dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/test'
+  dataset_dirpath: './CUFED/test'

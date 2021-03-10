@@ -130,7 +130,7 @@ class TTSRLitComposer(BaseLitComposer):
             'val_psnr': psnr_loss
             , 'val_ssim': ssim_loss
         }
-        self.log_dict(output, prog_bar=True, sync_dist=True)
+        self.log_dict(output, sync_dist=True)
 
         return output
 

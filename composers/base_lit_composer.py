@@ -214,7 +214,7 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
         for o in outputs[:5]:
             keys |= set(o.keys())
         output = {
-            f'a_{k}': \
+            f'avg_{k}': \
             torch.as_tensor([o[k] for o in outputs if o.get(k, None) is not None]).mean() \
             for k in keys
         }
