@@ -65,6 +65,10 @@ if __name__ == "__main__":
         lit_model.load_baseline(baseline_lit_model)
         del baseline_lit_model
     
+    baseline_pt_checkpoint = config.get('baseline_pt_checkpoint', None)
+    if baseline_pt_checkpoint is not None:
+        lit_model.load_pt_baseline(baseline_pt_checkpoint)
+    
     # Form logger and checkpoint callback
     if 'train' in modes:
         logger = pl.loggers.TensorBoardLogger(save_dir=log_save_dir, name='')

@@ -141,6 +141,12 @@ class FullTTSRLitComposer(TTSRLitComposer):
     def load_baseline(self, baseline):
         self.model.load_state_dict(baseline.model.state_dict())
 
+    def load_pt_baseline(self, pt_baseline_path: str):
+        model_state_dict_save = {k:v for k,v in torch.load(pt_baseline_path).items()}
+        model_state_dict = self.model.state_dict()
+        model_state_dict.update(model_state_dict_save)
+        self.model.load_state_dict(model_state_dict)
+
     def training_step(self, batch, batch_idx, optimizer_idx):
         lr = batch['LR']
         lr_sr = batch['LR_sr']
