@@ -62,6 +62,7 @@ if __name__ == "__main__":
 
     baseline_checkpoint = config.get('baseline_checkpoint', None)
     if baseline_checkpoint is not None:
+        print(f'Loaded: {baseline_checkpoint}')
         BComposer = getattr(composers, config.get('baseline_composer'))
         baseline_lit_model = BComposer.load_from_checkpoint(baseline_checkpoint)
         lit_model.load_baseline(baseline_lit_model)
