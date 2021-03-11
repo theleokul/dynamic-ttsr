@@ -56,6 +56,7 @@ if __name__ == "__main__":
 
     Composer = getattr(composers, config.get('composer'))
     if model_checkpoint is not None:
+        print(f'Loaded: {model_checkpoint}')
         lit_model = Composer.load_from_checkpoint(model_checkpoint, **config)
     else:
         lit_model = Composer(**config)
