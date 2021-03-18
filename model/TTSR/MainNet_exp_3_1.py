@@ -17,7 +17,7 @@ from MainNet import conv1x1, conv3x3, ResBlock, SFE
 
 class CSFI13(nn.Module):
     def __init__(self, n_feats):
-        super(CSFI2, self).__init__()
+        super().__init__()
         self.conv12 = conv1x1(n_feats, n_feats)
         self.conv21 = conv3x3(n_feats, n_feats, 4)
 
