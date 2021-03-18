@@ -81,7 +81,7 @@ class MainNet(nn.Module):
 
         self.RB31 = nn.ModuleList()
         self.RB33 = nn.ModuleList()
-        for i in range(self.num_res_blocks[3]):
+        for i in range(self.num_res_blocks[2]):
             self.RB31.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
             self.RB33.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
 
