@@ -6,7 +6,7 @@ model_checkpoint_callback__save_top_k: 55
 model_checkpoint_callback__mode: 'max'
 # model_checkpoint: './drive/MyDrive/skoltech/train_suite_ttsr_orig'
 # baseline_checkpoint: ...
-# baseline_composer: ...
+baseline_composer: TTSRLitComposer
 composer: FullTTSRLitComposer
 
 trainer__kwargs:

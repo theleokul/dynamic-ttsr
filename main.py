@@ -32,6 +32,7 @@ warnings.filterwarnings('ignore')  # To shut down some useless shit pytorch some
 parser = argparse.ArgumentParser(description='Main entry to train/evaluate models.')
 parser.add_argument('--config', nargs='+', type=str, required=True)
 parser.add_argument('-g', '--gpus', nargs='+', type=int, default=[], help='GPUs')
+parser.add_argument('-b', '--baseline-checkpoint', type=str, default=None)
 
 args = parser.parse_args()
 config = {}
@@ -61,7 +62,11 @@ if __name__ == "__main__":
     else:
         lit_model = Composer(**config)
 
+
     baseline_checkpoint = config.get('baseline_checkpoint', None)
+    if args.baseline_checkpoint is not None:
+        baseline_checkpoint = args.baseline_checkpoint
+
     if baseline_checkpoint is not None:
         print(f'Loaded: {baseline_checkpoint}')
         BComposer = getattr(composers, config.get('baseline_composer'))
