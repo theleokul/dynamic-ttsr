@@ -10,7 +10,7 @@ baseline_composer: TTSRLitComposer
 composer: FullTTSRLitComposer
 
 trainer__kwargs:
-  max_epochs: 48
+  max_epochs: 50
   accelerator: 'dp'
 
 # Model
