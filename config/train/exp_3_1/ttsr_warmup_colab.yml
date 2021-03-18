@@ -15,8 +15,9 @@ trainer__kwargs:
 model: 'TTSR'
 model__kwargs:
   n_feats: 64
-  num_res_blocks: 8+8+4+2
+  num_res_blocks: 16+16+4
   res_scale: 1.
+  experiment: '3_1'
 
 # Training
 batch_size: 9

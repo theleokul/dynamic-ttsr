@@ -146,8 +146,7 @@ class MainNet(nn.Module):
         self.conv11_head = conv3x3(256+n_feats, n_feats)
         self.RB11 = nn.ModuleList()
         for i in range(self.num_res_blocks[1]):
-            self.RB11.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
+            self.RB11.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
         self.conv11_tail = conv3x3(n_feats, n_feats)
 
         ### subpixel 1 -> 2
@@ -163,10 +162,8 @@ class MainNet(nn.Module):
         self.RB21 = nn.ModuleList()
         self.RB22 = nn.ModuleList()
         for i in range(self.num_res_blocks[2]):
-            self.RB21.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
-            self.RB22.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
+            self.RB21.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
+            self.RB22.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
 
         self.conv21_tail = conv3x3(n_feats, n_feats)
         self.conv22_tail = conv3x3(n_feats, n_feats)
@@ -186,12 +183,9 @@ class MainNet(nn.Module):
         self.RB32 = nn.ModuleList()
         self.RB33 = nn.ModuleList()
         for i in range(self.num_res_blocks[3]):
-            self.RB31.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
-            self.RB32.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
-            self.RB33.append(ResBlock(in_channels=n_feats, out_channels=n_feats,
-                res_scale=res_scale))
+            self.RB31.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
+            self.RB32.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
+            self.RB33.append(ResBlock(in_channels=n_feats, out_channels=n_feats, res_scale=res_scale))
 
         self.conv31_tail = conv3x3(n_feats, n_feats)
         self.conv32_tail = conv3x3(n_feats, n_feats)

@@ -1,25 +1,28 @@
 # Main metainfo
-log_save_dir: './drive/MyDrive/skoltech/exp_3_1/lightning_logs'
+log_save_dir: './drive/MyDrive/skoltech/exp_4_1/lightning_logs'
 
 model_checkpoint_callback__monitor: ['a_psnr', 'a_ssim']
 model_checkpoint_callback__save_top_k: 55
 model_checkpoint_callback__mode: 'max'
 # model_checkpoint: './drive/MyDrive/skoltech/train_suite_ttsr_orig'
-# baseline_checkpoint: ...
-# baseline_composer: ...
 composer: FullTTSRLitComposer
 
 trainer__kwargs:
-  max_epochs: 48
+  max_epochs: 48 #20 # 26 # 34  # 41 48
+  # track_grad_norm: 2
+  # gradient_clip_val: .5
+  # precision: 16
   accelerator: 'dp'
+  # limit_train_batches: 0.01
+  # limit_val_batches: 0.1
+  # fast_dev_run: True
 
 # Model
 model: 'TTSR'
 model__kwargs:
   n_feats: 64
-  num_res_blocks: 16+16+4
+  num_res_blocks: 8+8+4+2
   res_scale: 1.
-  experiment: '3_1'
 
 # Training
 batch_size: 9
