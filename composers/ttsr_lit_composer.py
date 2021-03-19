@@ -37,6 +37,7 @@ class TTSRLitComposer(BaseLitComposer):
         ref_sr = batch['Ref_sr']
 
         sr, _, _, _, _ = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
+        print(dir(utils))
         psnr_loss, ssim_loss = utils.calc_psnr_and_ssim(sr.detach(), hr.detach())
 
         output = {
