@@ -1,4 +1,4 @@
-# model_checkpoint: './drive/MyDrive/skoltech/exp_3_1/lightning_logs/version_1/checkpoints/epoch=47-a_psnr=25.3215-a_ssim=0.7551.ckpt'
+model_checkpoint: './drive/MyDrive/skoltech/exp_3_1/lightning_logs/version_1/checkpoints/epoch=47-a_psnr=25.3215-a_ssim=0.7551.ckpt'
 composer: FullTTSRLitComposer
 output_dir: './drive/MyDrive/skoltech/exp_3_1/output'
 # modes: test

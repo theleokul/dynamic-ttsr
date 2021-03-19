@@ -33,6 +33,8 @@ parser = argparse.ArgumentParser(description='Main entry to train/evaluate model
 parser.add_argument('--config', nargs='+', type=str, required=True)
 parser.add_argument('-g', '--gpus', nargs='+', type=int, default=[], help='GPUs')
 parser.add_argument('-b', '--baseline-checkpoint', type=str, default=None)
+parser.add_argument('-m', '--model-checkpoint', type=str, default=None)
+parser.add_argument('--modes', type=str, default=None)
 
 args = parser.parse_args()
 config = {}
@@ -47,21 +49,28 @@ if __name__ == "__main__":
 
     # Pop metainfo
     modes = config.get('modes', 'train+val').split('+')
+    if args.modes is not None:
+        modes = args.modes
+
     output_dirpath = config.get('output_dir', './output')
     log_save_dir = config.get('log_save_dir', './logs')
     trainer__kwargs = config.get('trainer__kwargs', {})
+    
     model_checkpoint = config.get('model_checkpoint', None)
+    if args.model_checkpoint is not None:
+        model_checkpoint = args.model_checkpoint
+
     model_checkpoint_callback__monitor = config.get('model_checkpoint_callback__monitor', ['avg_val_loss'])
     model_checkpoint_callback__save_top_k = config.get('model_checkpoint_callback__save_top_k', 1)
     model_checkpoint_callback__mode = config.get('model_checkpoint_callback__mode', 'min')
 
     Composer = getattr(composers, config.get('composer'))
+
     if model_checkpoint is not None:
         print(f'Loaded: {model_checkpoint}')
         lit_model = Composer.load_from_checkpoint(model_checkpoint, **config)
     else:
         lit_model = Composer(**config)
-
 
     baseline_checkpoint = config.get('baseline_checkpoint', None)
     if args.baseline_checkpoint is not None:
