@@ -19,7 +19,7 @@ DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH.parent))
 from model import TTSR, Vgg19, Discriminator
 from dataset import CufedTrainDataset, CufedTestDataset
-from loss import ReconstructionLoss, PerceptualLoss, TPerceptualLoss, WGANGPAdversarialLoss, DictBasedLoss
+from loss import ReconstructionLoss, PerceptualLoss, TPerceptualLoss, WGANGPAdversarialLoss, DictBasedLoss, SparsityLoss
 
 
 class BaseLitComposer(pl.LightningModule, abc.ABC):
