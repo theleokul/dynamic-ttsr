@@ -99,3 +99,68 @@ class DictBasedLoss:
         else:
             item =  self.losses[key]
         return item
+
+
+class SparsityLoss(nn.Module):
+    ''' 
+    Defines the sparsity loss, consisting of two parts:
+    - network loss: MSE between computational budget used for whole network and target 
+    - block loss: sparsity (percentage of used FLOPS between 0 and 1) in a block must lie between upper and lower bound. 
+    This loss is annealed.
+    '''
+
+    def __init__(self, sparsity_target, num_epochs, logger=None):
+        super().__init__()
+        self.sparsity_target = sparsity_target
+        self.num_epochs = num_epochs
+        self.logger = logger
+
+    def forward(self, meta):
+
+        p = meta['epoch'] / (0.33*self.num_epochs)
+        progress = math.cos(min(max(p, 0), 1) * (math.pi / 2))**2
+        upper_bound = (1 - progress*(1-self.sparsity_target))
+        lower_bound = progress*self.sparsity_target
+
+        loss_block = torch.tensor(.0).to(device=meta['device'])
+        cost, total = torch.tensor(.0).to(device=meta['device']), torch.tensor(.0).to(device=meta['device'])
+
+        maskss = meta['masks_11'], meta['masks_21'], meta['masks_22'], meta['masks_31'], meta['masks_32'], meta['masks_33']
+        for k, masks in enumerate(maskss):
+            for i, mask in enumerate(masks):
+                m_dil = mask['dilate']
+                m = mask['std']
+
+                c = m_dil.active_positions * m_dil.flops_per_position + \
+                    m.active_positions * m.flops_per_position
+                t = m_dil.total_positions * m_dil.flops_per_position + \
+                    m.total_positions * m.flops_per_position
+
+                layer_perc = c / t
+                if self.logger is not None:
+                    self.logger.log(f'layer_perc_{k}_'+str(i), layer_perc.item())
+
+                assert layer_perc >= 0 and layer_perc <= 1, layer_perc
+                loss_block += max(0, layer_perc - upper_bound)**2  # upper bound
+                loss_block += max(0, lower_bound - layer_perc)**2  # lower bound
+
+                cost += c
+                total += t
+
+        perc = cost/total
+        assert perc >= 0 and perc <= 1, perc
+        loss_block /= (len(meta['masks_11']) + len(meta['masks_21']) + \
+                        len(meta['masks_22']) + len(meta['masks_31']) + \
+                        len(meta['masks_32']) + len(meta['masks_33']))
+        loss_network = (perc - self.sparsity_target)**2
+
+        if logger is not None:
+            self.logger.log_dict({
+                'upper_bound': upper_bound
+                , 'lower_bound': lower_bound
+                , 'cost_perc': perc.item()
+                , 'loss_sp_block': loss_block.item()
+                , 'loss_sp_network': loss_network.item()
+            })
+
+        return loss_network + loss_block

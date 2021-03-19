@@ -26,6 +26,7 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
 
     @staticmethod
     def _parse_loss_atom(loss_name: str) -> T.Callable:
+        loss = None
         if loss_name == 'rec':
             loss = ReconstructionLoss()
         elif loss_name == 'per':

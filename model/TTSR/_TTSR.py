@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
-import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, LTE, SearchTransfer
+import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, LTE, SearchTransfer
 
 
 class TTSR(nn.Module):
@@ -38,6 +38,13 @@ class TTSR(nn.Module):
                 , n_feats=n_feats 
                 , res_scale=res_scale
             )
+        elif experiment == '8':
+            print('Running experiment 8...')
+            self.MainNet = MainNet_exp_8.MainNet(
+                num_res_blocks=self.num_res_blocks
+                , n_feats=n_feats 
+                , res_scale=res_scale
+            )
         else:
             self.MainNet = MainNet.MainNet(
                 num_res_blocks=self.num_res_blocks
@@ -49,7 +56,7 @@ class TTSR(nn.Module):
         self.LTE_copy = LTE.LTE(requires_grads=[False, False, False]) ### used in transferal perceptual loss
         self.SearchTransfer = SearchTransfer.SearchTransfer()
 
-    def forward(self, lr=None, lrsr=None, ref=None, refsr=None, sr=None):
+    def forward(self, lr=None, lrsr=None, ref=None, refsr=None, sr=None, meta=None):
         if (type(sr) != type(None)):
             self.LTE_copy.load_state_dict(self.LTE.state_dict())
             
@@ -72,13 +79,18 @@ class TTSR(nn.Module):
         ref_lv1, ref_lv2, ref_lv3 = self.LTE((ref.detach() + 1.) / 2.)
         S, T_lv3, T_lv2, T_lv1 = self.SearchTransfer(lrsr_lv3, refsr_lv3, ref_lv1, ref_lv2, ref_lv3)
 
-        sr = self.MainNet(lr, S, T_lv3, T_lv2, T_lv1)
+        if self.experiment == '8':
+            sr, meta = self.MainNet(lr, S, T_lv3, T_lv2, T_lv1, meta=meta)
+        else:
+            sr = self.MainNet(lr, S, T_lv3, T_lv2, T_lv1)
 
         if self.experiment == '3_1':
             # output = sr, S, T_lv3, None, T_lv1
             output = sr, S, T_lv3, T_lv2, T_lv1
         elif self.experiment == '3_2':
             output = sr, S, T_lv3, None, None
+        elif self.experiment == '8':
+            output = sr, S, T_lv3, T_lv2, T_lv1, meta
         else:
             output = sr, S, T_lv3, T_lv2, T_lv1
 

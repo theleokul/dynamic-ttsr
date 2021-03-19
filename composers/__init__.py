@@ -1,2 +1,4 @@
 from .ttsr_lit_composer import TTSRLitComposer
 from .full_ttsr_lit_composer import FullTTSRLitComposer
+from .dy_ttsr_lit_composer import DyTTSRLitComposer
+from .dy_full_ttsr_lit_composer import DyFullTTSRLitComposer

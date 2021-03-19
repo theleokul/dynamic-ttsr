@@ -22,7 +22,6 @@ import imageio
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(DIR_PATH)
 import utils
-# import lit_composer
 import composers
 
 
@@ -43,7 +42,7 @@ for c in args.config:
 gpus = args.gpus
 
 
-if __name__ == "__main__":
+def main():
     os.environ['CUDA_VISIBLE_DEVICES'] = ', '.join([str(g) for g in gpus])
 
     # Pop metainfo
@@ -171,3 +170,7 @@ if __name__ == "__main__":
             lit_model.predict_step(batch, i, output_dirpath, device)
     else:
         raise NotImplementedError()
+
+
+if __name__ == "__main__":
+    main()
