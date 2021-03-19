@@ -39,7 +39,7 @@ class ResBlock(nn.Module):
         , base_width=64
         , dilation=1
         , sparse=True
-        , scaling=3
+        , scaling=None
     ):
 
         super().__init__()

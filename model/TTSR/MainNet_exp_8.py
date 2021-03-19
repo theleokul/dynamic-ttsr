@@ -28,8 +28,7 @@ class SFE(nn.Module):
         
         self.RBs = nn.ModuleList()
         for i in range(self.num_res_blocks):
-            self.RBs.append(ResBlock(in_channels=n_feats, out_channels=n_feats, 
-                res_scale=res_scale))
+            self.RBs.append(ResBlock(n_feats, n_feats))
             
         self.conv_tail = conv3x3(n_feats, n_feats)
         

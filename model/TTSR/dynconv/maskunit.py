@@ -37,7 +37,7 @@ class MaskUnit(nn.Module):
     Generates the mask and applies the gumbel softmax trick 
     '''
 
-    def __init__(self, channels, stride=1, dilate_stride=1, scaling=1):
+    def __init__(self, channels, stride=1, dilate_stride=1, scaling=None):
         super(MaskUnit, self).__init__()
         self.maskconv = Squeeze(channels=channels, stride=stride)
         self.gumbel = Gumbel()
@@ -53,7 +53,9 @@ class MaskUnit(nn.Module):
         mask_dilate = Mask(hard_dilate)
         
         m = {'std': mask, 'dilate': mask_dilate}
-        meta[f'masks_{self.scaling}'].append(m)
+        if scaling is not None:
+            meta[f'masks_{self.scaling}'].append(m)
+    
         return m
 
 
