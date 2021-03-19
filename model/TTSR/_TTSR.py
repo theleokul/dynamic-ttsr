@@ -11,7 +11,7 @@ import MainNet, MainNet_exp_3_1, LTE, SearchTransfer
 
 
 class TTSR(nn.Module):
-    def __init__(self, n_feats, num_res_blocks, res_scale, experiment='3_1'):
+    def __init__(self, n_feats, num_res_blocks, res_scale, experiment=''):
         super(TTSR, self).__init__()
         self.num_res_blocks = list( map(int, num_res_blocks.split('+')) )
         self.experiment = experiment
