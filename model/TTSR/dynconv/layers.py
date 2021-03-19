@@ -41,6 +41,7 @@ def bn_relu(bn_module, relu_module, x, mask, fast=False):
 
 ## RELU
 def relu(relu_module, x, mask, fast=False):
-    relu_module.__mask__ = mask
+    if relu_module is not None:
+        relu_module.__mask__ = mask
     x = relu_module(x) if relu_module is not None else x
     return x

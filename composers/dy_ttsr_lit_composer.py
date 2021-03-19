@@ -49,6 +49,8 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
             , 'bs': loss_sparse.detach()
         }
 
+        self.log_dict(output, prog_bar=True)
+
         return output
 
     def training_epoch_end(self, outputs):
