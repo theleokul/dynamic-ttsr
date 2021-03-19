@@ -32,14 +32,14 @@ class SFE(nn.Module):
             
         self.conv_tail = conv3x3(n_feats, n_feats)
         
-    def forward(self, x):
+    def forward(self, x, meta):
         x = F.relu(self.conv_head(x))
         x1 = x
         for i in range(self.num_res_blocks):
-            x = self.RBs[i](x)
+            x, meta = self.RBs[i](x, meta)
         x = self.conv_tail(x)
         x = x + x1
-        return x
+        return x, meta
 
 
 class CSFI2(nn.Module):
@@ -184,7 +184,7 @@ class MainNet(nn.Module):
 
     def forward(self, x, S=None, T_lv3=None, T_lv2=None, T_lv1=None, meta=None):
         ### shallow feature extraction
-        x = self.SFE(x)
+        x, meta = self.SFE(x, meta)
 
         ### stage11
         x11 = x
