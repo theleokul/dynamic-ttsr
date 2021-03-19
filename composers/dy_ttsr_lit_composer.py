@@ -17,9 +17,9 @@ from loss import SparsityLoss
 
 class DyTTSRLitComposer(FullTTSRLitComposer):
 
-    @staticmethod
-    def _parse_loss_atom(loss_name: str) -> T.Callable:
-        loss = super()._parse_loss_atom(loss_name)
+    @classmethod
+    def _parse_loss_atom(cls, loss_name: str) -> T.Callable:
+        loss = cls._parse_loss_atom(loss_name)
 
         if loss is None:
             if loss_name == 'bsparse':
