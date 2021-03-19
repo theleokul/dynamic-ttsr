@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
-from dyconv import ResBlock
+from dynconv import ResBlock
 
 
 def conv1x1(in_channels, out_channels, stride=1):
