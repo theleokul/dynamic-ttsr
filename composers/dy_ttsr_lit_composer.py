@@ -19,7 +19,7 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.epoch_num = self.kwargs.trainer__kwargs['max_epochs']
+        self.epoch_num = self.kwargs['trainer__kwargs']['max_epochs']
         self.gumbel_temp = 1.0
         self.gumbel_noise = True
 
