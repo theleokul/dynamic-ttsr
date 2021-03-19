@@ -35,6 +35,7 @@ parser.add_argument('-g', '--gpus', nargs='+', type=int, default=[], help='GPUs'
 parser.add_argument('-b', '--baseline-checkpoint', type=str, default=None)
 parser.add_argument('-m', '--model-checkpoint', type=str, default=None)
 parser.add_argument('--modes', type=str, default=None)
+parser.add_argument('-O', '--output-dirpath', type=str, default=None)
 
 args = parser.parse_args()
 config = {}
@@ -53,6 +54,9 @@ if __name__ == "__main__":
         modes = args.modes
 
     output_dirpath = config.get('output_dir', './output')
+    if args.output_dirpath is not None:
+        output_dirpath = args.output_dirpath
+
     log_save_dir = config.get('log_save_dir', './logs')
     trainer__kwargs = config.get('trainer__kwargs', {})
     
