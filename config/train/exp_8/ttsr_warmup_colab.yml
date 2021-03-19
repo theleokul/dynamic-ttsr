@@ -22,7 +22,7 @@ model__kwargs:
 
 # Training
 batch_size: 9
-loss: 'rec+bsparse'
+loss: 'rec+0.1*bsparse'
 
 optimizer: Adam
 lr:
