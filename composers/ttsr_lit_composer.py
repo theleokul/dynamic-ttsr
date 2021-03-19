@@ -9,10 +9,10 @@ import torch
 import kornia as K
 import imageio
 
-DIR_PATH = pathlib.Path(__file__).resolve().parent
-sys.path.append(str(DIR_PATH))
-from base_lit_composer import BaseLitComposer
-import utils
+ROOT_PATH = pathlib.Path(__file__).resolve().parent.parent
+sys.path.append(str(ROOT_PATH))
+from composers.base_lit_composer import BaseLitComposer
+import composers.utils as cutils
 
 
 class TTSRLitComposer(BaseLitComposer):
@@ -37,8 +37,7 @@ class TTSRLitComposer(BaseLitComposer):
         ref_sr = batch['Ref_sr']
 
         sr, _, _, _, _ = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
-        print(dir(utils))
-        psnr_loss, ssim_loss = utils.calc_psnr_and_ssim(sr.detach(), hr.detach())
+        psnr_loss, ssim_loss = cutils.calc_psnr_and_ssim(sr.detach(), hr.detach())
 
         output = {
             'psnr': psnr_loss

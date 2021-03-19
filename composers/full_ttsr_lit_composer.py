@@ -10,7 +10,6 @@ import kornia as K
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
 from ttsr_lit_composer import TTSRLitComposer
-import utils
 
 
 class FullTTSRLitComposer(TTSRLitComposer):
