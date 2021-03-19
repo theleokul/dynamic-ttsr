@@ -35,6 +35,11 @@ class BaseLitComposer(pl.LightningModule, abc.ABC):
             loss = TPerceptualLoss()
         elif loss_name == 'adv':
             loss = WGANGPAdversarialLoss()
+        elif loss_name == 'bsparse':
+            loss = SparsityLoss(-1, 2)  # no sparsity
+        elif loss_name == 'sparse':
+            loss = SparsityLoss(0.7, 50)
+
         return loss
 
     @classmethod
