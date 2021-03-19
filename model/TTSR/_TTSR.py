@@ -46,7 +46,7 @@ class TTSR(nn.Module):
             )
 
         self.LTE      = LTE.LTE(requires_grads=LTE_requires_grads)
-        self.LTE_copy = LTE.LTE(requires_grad=[False, False, False]) ### used in transferal perceptual loss
+        self.LTE_copy = LTE.LTE(requires_grads=[False, False, False]) ### used in transferal perceptual loss
         self.SearchTransfer = SearchTransfer.SearchTransfer()
 
     def forward(self, lr=None, lrsr=None, ref=None, refsr=None, sr=None):
