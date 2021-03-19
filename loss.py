@@ -155,7 +155,7 @@ class SparsityLoss(nn.Module):
                         len(meta['masks_32']) + len(meta['masks_33']))
         loss_network = (perc - self.sparsity_target)**2
 
-        if logger is not None:
+        if self.logger is not None:
             self.logger.log_dict({
                 'upper_bound': upper_bound
                 , 'lower_bound': lower_bound
