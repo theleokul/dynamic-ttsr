@@ -38,7 +38,7 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
         sr, S, T_lv3, T_lv2, T_lv1, meta = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr, meta=meta)
 
         loss_rec = self.loss['rec'](sr, hr)
-        if 'bsparse' is self.loss.losses:
+        if 'bsparse' in self.loss.losses:
             loss_sparse = self.loss['bsparse'](meta)
 
         loss = loss_rec * self.loss['coef_rec'] \

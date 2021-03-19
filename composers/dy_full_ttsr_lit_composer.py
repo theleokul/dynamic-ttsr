@@ -44,7 +44,7 @@ class DyFullTTSRLitComposer(DyTTSRLitComposer):
                 fake = sr
                 d_fake = self.discriminator(fake)
                 loss_adv = self.loss['adv'](d_fake, discriminator=False)
-            if 'sparse' is self.loss.losses:
+            if 'sparse' in self.loss.losses:
                 loss_sparse = self.loss['sparse'](meta)
 
             loss = loss_rec * self.loss['coef_rec'] \
