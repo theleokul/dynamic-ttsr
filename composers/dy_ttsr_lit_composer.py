@@ -10,6 +10,7 @@ import kornia as K
 
 ROOT_PATH = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_PATH))
+from composers.ttsr_lit_composer import TTSRLitComposer
 from composers.full_ttsr_lit_composer import FullTTSRLitComposer
 import composers.utils as cutils
 from loss import SparsityLoss
@@ -119,3 +120,32 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
         imageio.imsave(os.path.join(output_dirpath, f'{batch_idx}_pred.png'), y_pred)
         imageio.imsave(os.path.join(output_dirpath, f'{batch_idx}_gt.png'), y)
         imageio.imsave(os.path.join(output_dirpath, f'{batch_idx}_ref.png'), ref)
+
+    def training_epoch_end(self, outputs):
+        keys = set()
+        # NOTE: Check keys only in first 5 outputs by default (Override if more needed)
+        for o in outputs[:2]:
+            keys |= set(o.keys())
+        
+        to_log = {
+            f'a_{k}': \
+            torch.as_tensor([o[k] for o in outputs if o.get(k, None) is not None]).mean() \
+            for k in keys
+        }
+        self.log_dict(to_log, prog_bar=True)
+
+    def validation_epoch_end(self, outputs):
+        keys = set()
+        # NOTE: Check keys only in first 5 outputs by default (Override if more needed)
+        for o in outputs[:2]:
+            keys |= set(o.keys())
+        
+        to_log = {
+            f'a_{k}': \
+            torch.as_tensor([o[k] for o in outputs if o.get(k, None) is not None]).mean() \
+            for k in keys
+        }
+        self.log_dict(to_log, prog_bar=True)
+
+    def test_epoch_end(self, outputs):
+        self.validation_epoch_end(outputs)
