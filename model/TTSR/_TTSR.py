@@ -54,8 +54,9 @@ class TTSR(nn.Module):
             self.LTE_copy.load_state_dict(self.LTE.state_dict())
             
             if self.experiment == '3_1':
-                sr_lv1, _, sr_lv3 = self.LTE_copy((sr + 1.) / 2.)
-                output = sr_lv1, None, sr_lv3
+                sr_lv1, sr_lv2, sr_lv3 = self.LTE_copy((sr + 1.) / 2.)
+                # output = sr_lv1, None, sr_lv3
+                output = sr_lv1, sr_lv2, sr_lv3
             elif self.experiment == '3_2':
                 _, _, sr_lv3 = self.LTE_copy((sr + 1.) / 2.)
                 output = None, None, sr_lv3
@@ -74,7 +75,8 @@ class TTSR(nn.Module):
         sr = self.MainNet(lr, S, T_lv3, T_lv2, T_lv1)
 
         if self.experiment == '3_1':
-            output = sr, S, T_lv3, None, T_lv1
+            # output = sr, S, T_lv3, None, T_lv1
+            output = sr, S, T_lv3, T_lv2, T_lv1
         elif self.experiment == '3_2':
             output = sr, S, T_lv3, None, None
         else:
