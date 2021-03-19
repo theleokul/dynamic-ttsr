@@ -76,7 +76,7 @@ class ResBlock(nn.Module):
             mask_dilate, mask = m['dilate'], m['std']
 
             x = dynconv.conv3x3(self.conv1, x, None, mask_dilate)
-            x = dyconv.relu(self.relu, x, mask_dilate)
+            x = dynconv.relu(self.relu, x, mask_dilate)
 
             x = dynconv.conv3x3(self.conv2, x, mask_dilate, mask)
             x = dynconv.relu(None, x, mask)  # No relu applied actually (calling just for metainfo)
