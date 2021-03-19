@@ -52,14 +52,18 @@ class TPerceptualLoss(nn.Module):
 
         if (self.type == 'l1'):
             loss_texture  = F.l1_loss(map_lv3 * S_lv3, T_lv3 * S_lv3)
-            loss_texture += F.l1_loss(map_lv2 * S_lv2, T_lv2 * S_lv2)
-            loss_texture += F.l1_loss(map_lv1 * S_lv1, T_lv1 * S_lv1)
-            loss_texture /= 3.
+            if T_lv2 is not None:
+                loss_texture += F.l1_loss(map_lv2 * S_lv2, T_lv2 * S_lv2)
+            if T_lv1 is not None:
+                loss_texture += F.l1_loss(map_lv1 * S_lv1, T_lv1 * S_lv1)
+            loss_texture /= len(list(filter(lambda x: x is not None, [T_lv3, T_lv2, T_lv1])))
         elif (self.type == 'l2'):
             loss_texture  = F.mse_loss(map_lv3 * S_lv3, T_lv3 * S_lv3)
-            loss_texture += F.mse_loss(map_lv2 * S_lv2, T_lv2 * S_lv2)
-            loss_texture += F.mse_loss(map_lv1 * S_lv1, T_lv1 * S_lv1)
-            loss_texture /= 3.
+            if T_lv2 is not None:
+                loss_texture += F.mse_loss(map_lv2 * S_lv2, T_lv2 * S_lv2)
+            if T_lv1 is not None:
+                loss_texture += F.mse_loss(map_lv1 * S_lv1, T_lv1 * S_lv1)
+            loss_texture /= len(list(filter(lambda x: x is not None, [T_lv3, T_lv2, T_lv1])))
         
         return loss_texture
 

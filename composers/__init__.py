@@ -1,1 +1,2 @@
-from .ttsr_lit_composer import TTSRLitComposer, FullTTSRLitComposer
+from .ttsr_lit_composer import TTSRLitComposer
+from .full_ttsr_lit_composer import FullTTSRLitComposer

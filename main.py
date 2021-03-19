@@ -16,8 +16,6 @@ import torch.nn.functional as F
 import torch.utils.data as data
 import torchvision as tv
 import torchvision.transforms as tv_transforms
-# import kornia as K
-# import kornia.augmentation as KA
 import pytorch_lightning as pl
 import imageio
 
@@ -49,7 +47,7 @@ if __name__ == "__main__":
     os.environ['CUDA_VISIBLE_DEVICES'] = ', '.join([str(g) for g in gpus])
 
     # Pop metainfo
-    modes = config.get('modes', 'train+val').split('+')
+    modes = config.get('modes', 'train').split('+')
     if args.modes is not None:
         modes = args.modes
 
@@ -92,8 +90,8 @@ if __name__ == "__main__":
         print(f'Loaded: {baseline_pt_checkpoint}')
         lit_model.load_pt_baseline(baseline_pt_checkpoint)
     
-    # Form logger and checkpoint callback
     if 'train' in modes:
+        # Form logger and checkpoint callback
         logger = pl.loggers.TensorBoardLogger(save_dir=log_save_dir, name='')
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             monitor=model_checkpoint_callback__monitor[0]
@@ -158,8 +156,6 @@ if __name__ == "__main__":
         device = torch.device('cuda') if len(gpus) >= 1 else torch.device('cpu')
         lit_model.to(device)
 
-        to_PIL_transformer = tv_transforms.ToPILImage()
-
         test_dataset = lit_model._parse_dataset(
             config.get('test_dataset')
             , *config.get('test_dataset__args', [])
@@ -172,40 +168,6 @@ if __name__ == "__main__":
         )
 
         for i, batch in tqdm(enumerate(test_data_loader), total=len(test_data_loader)):
-            lr = batch['LR'].to(device)
-            lr_sr = batch['LR_sr'].to(device)
-            hr = batch['HR'].to(device)
-            ref = batch['Ref'].to(device)
-            ref_sr = batch['Ref_sr'].to(device)
-
-            with torch.no_grad():
-                sr, _, _, _, _ = lit_model(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr)
-
-            x = lr
-            y_pred = sr
-            y = hr
-
-            # Denormalize
-            x = (x + 1.) * 127.5
-            # x = x.clamp(0., 255.).type(torch.uint8)
-            x = np.transpose(x.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
-            y_pred = (y_pred + 1.) * 127.5
-            # y_pred = y_pred.clamp(0., 255.).type(torch.uint8)
-            y_pred = np.transpose(y_pred.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
-            y = (y + 1.) * 127.5
-            y = np.transpose(y.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
-            # y = y.clamp(0., 255.).type(torch.uint8)
-            ref = (ref + 1.) * 127.5
-            ref = np.transpose(ref.squeeze().round().cpu().numpy(), (1, 2, 0)).astype(np.uint8)
-            # ref = ref.clamp(0., 255.).type(torch.uint8)
-
-            # for j, (x, yp, y, ref) in enumerate(zip(x, y_pred, y, ref)):
-            # k = i * lit_model.batch_size + j
-            k = i
-            # imageio.imsave(save_path, sr_save)
-            imageio.imsave(os.path.join(output_dirpath, f'{k}_input.png'), x)
-            imageio.imsave(os.path.join(output_dirpath, f'{k}_pred.png'), y_pred)
-            imageio.imsave(os.path.join(output_dirpath, f'{k}_gt.png'), y)
-            imageio.imsave(os.path.join(output_dirpath, f'{k}_ref.png'), ref)
+            lit_model.predict_step(batch, i, output_dirpath, device)
     else:
         raise NotImplementedError()

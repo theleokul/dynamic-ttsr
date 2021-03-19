@@ -6,7 +6,7 @@ from utils import MeanShift
 
 
 class LTE(torch.nn.Module):
-    def __init__(self, requires_grad=True, rgb_range=1):
+    def __init__(self, requires_grads=[True, True, True], rgb_range=1):
         super(LTE, self).__init__()
         
         ### use vgg19 weights to initialize
@@ -22,13 +22,19 @@ class LTE(torch.nn.Module):
             self.slice2.add_module(str(x), vgg_pretrained_features[x])
         for x in range(7, 12):
             self.slice3.add_module(str(x), vgg_pretrained_features[x])
-        if not requires_grad:
+
+        # if not requires_grad:
+        if not requires_grads[0]:
             for param in self.slice1.parameters():
-                param.requires_grad = requires_grad
+                param.requires_grad = requires_grads[0]
+
+        if not requires_grads[1]:
             for param in self.slice2.parameters():
-                param.requires_grad = requires_grad
+                param.requires_grad = requires_grads[1]
+
+        if not requires_grads[2]:
             for param in self.slice3.parameters():
-                param.requires_grad = requires_grad
+                param.requires_grad = requires_grads[2]
         
         vgg_mean = (0.485, 0.456, 0.406)
         vgg_std = (0.229 * rgb_range, 0.224 * rgb_range, 0.225 * rgb_range)
