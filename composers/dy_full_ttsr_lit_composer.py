@@ -25,7 +25,7 @@ class DyFullTTSRLitComposer(DyTTSRLitComposer):
 
         meta = {
             'masks_11': [], 'masks_21': [], 'masks_22': [], 'masks_31': [], 'masks_32': [], 'masks_33': []
-            , 'device': self.device, 'gumbel_temp': gumbel_temp, 'gumbel_noise': gumbel_noise, 'epoch': self.current_epoch
+            , 'device': self.device, 'gumbel_temp': self.gumbel_temp, 'gumbel_noise': self.gumbel_noise, 'epoch': self.current_epoch
         }
 
         sr, S, T_lv3, T_lv2, T_lv1, meta = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr, meta=meta)

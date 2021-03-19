@@ -32,7 +32,7 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
 
         meta = {
             'masks_11': [], 'masks_21': [], 'masks_22': [], 'masks_31': [], 'masks_32': [], 'masks_33': []
-            , 'device': self.device, 'gumbel_temp': gumbel_temp, 'gumbel_noise': gumbel_noise, 'epoch': self.current_epoch
+            , 'device': self.device, 'gumbel_temp': self.gumbel_noise, 'gumbel_noise': self.gumbel_noise, 'epoch': self.current_epoch
         }
 
         sr, S, T_lv3, T_lv2, T_lv1, meta = self(lr=lr, lrsr=lr_sr, ref=ref, refsr=ref_sr, meta=meta)
@@ -56,7 +56,7 @@ class DyTTSRLitComposer(FullTTSRLitComposer):
     def training_epoch_end(self, outputs):
         super().training_epoch_end(outputs)
         # disable gumbel noise in finetuning stage
-        gumbel_noise = False if (self.current_epoch + 1) > 0.8 * self.epoch_num else True
+        self.gumbel_noise = False if (self.current_epoch + 1) > 0.8 * self.epoch_num else True
 
     def validation_step(self, batch, batch_idx):
         lr = batch['LR']
