@@ -37,7 +37,7 @@ class SFE(nn.Module):
         x = F.relu(self.conv_head(x))
         x1 = x
         for i in range(self.num_res_blocks):
-            x, meta = self.RBs[i](x, meta)
+            x, meta = self.RBs[i]([x, meta])
         x = self.conv_tail(x)
         x = x + x1
         return x, meta
