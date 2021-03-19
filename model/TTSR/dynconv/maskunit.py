@@ -53,7 +53,7 @@ class MaskUnit(nn.Module):
         mask_dilate = Mask(hard_dilate)
         
         m = {'std': mask, 'dilate': mask_dilate}
-        if scaling is not None:
+        if self.scaling is not None:
             meta[f'masks_{self.scaling}'].append(m)
     
         return m
