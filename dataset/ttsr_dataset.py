@@ -130,7 +130,7 @@ class CufedTrainDataset(Dataset):
         if self.add_input_noise_wsigma is not None:
             noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].shape)
             sample['LR'] += noise
-            sample['LR_sr'] += F.interpolate(noise.unsqueeze(0), sample['LR_sr'].shape, mode='bicubic').squeeze(0)
+            sample['LR_sr'] += F.interpolate(noise.unsqueeze(0), sample['LR_sr'].shape[-2:], mode='bicubic').squeeze(0)
 
         return sample
 
@@ -204,6 +204,6 @@ class CufedTestDataset(Dataset):
                 self._noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].shape)
 
             sample['LR'] += self._noise
-            sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].shape, mode='bicubic').squeeze(0)
+            sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].shape[-2:], mode='bicubic').squeeze(0)
 
         return sample
