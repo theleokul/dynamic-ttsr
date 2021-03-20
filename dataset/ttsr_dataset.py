@@ -69,6 +69,7 @@ class CufedTrainDataset(Dataset):
         self
         , dataset_dirpath: str
         , transform=transforms.Compose([RandomFlip(), RandomRotate(), ToTensor()])
+        , add_input_noise_wsigma=None
     ):
 
         self.input_list = sorted([os.path.join(dataset_dirpath, 'input', name) for name in 
@@ -76,6 +77,7 @@ class CufedTrainDataset(Dataset):
         self.ref_list = sorted([os.path.join(dataset_dirpath, 'ref', name) for name in 
             os.listdir( os.path.join(dataset_dirpath, 'ref') )])
         self.transform = transform
+        self.add_input_noise_wsigma = add_input_noise_wsigma
 
     def __len__(self):
         return len(self.input_list)
@@ -124,15 +126,32 @@ class CufedTrainDataset(Dataset):
 
         if self.transform:
             sample = self.transform(sample)
+
+        if self.add_input_noise_wsigma is not None:
+            noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].size)
+            sample['LR'] += noise
+            sample['LR_sr'] += F.interpolate(noise.unsqueeze(0), sample['LR_sr'].size, mode='bicubic').squeeze(0)
+
         return sample
 
 
 class CufedTestDataset(Dataset):
-    def __init__(self, dataset_dirpath: str, ref_level='1', transform=transforms.Compose([ToTensor()])):
+    def __init__(
+        self
+        , dataset_dirpath: str
+        , ref_level='1'
+        , transform=transforms.Compose([ToTensor()])
+        , add_input_noise_wsigma=None
+        , random_seed=42  # Used with noise
+    ):
+
         self.input_list = sorted(glob.glob(os.path.join(dataset_dirpath, 'CUFED5', '*_0.png')))
         self.ref_list = sorted(glob.glob(os.path.join(dataset_dirpath, 'CUFED5', 
             '*_' + ref_level + '.png')))
         self.transform = transform
+        self.add_input_noise_wsigma = add_input_noise_wsigma
+        self.random_seed = random_seed
+        self._noise = None
 
     def __len__(self):
         return len(self.input_list)
@@ -178,4 +197,13 @@ class CufedTestDataset(Dataset):
 
         if self.transform:
             sample = self.transform(sample)
+
+        if self.add_input_noise_wsigma is not None:
+            if self._noise is None:
+                torch.manual_seed(self.random_seed)  # Same noise for each validation element
+                self._noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].size)
+
+            sample['LR'] += self._noise
+            sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].size, mode='bicubic').squeeze(0)
+
         return sample

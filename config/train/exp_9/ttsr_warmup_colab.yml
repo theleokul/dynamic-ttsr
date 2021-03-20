@@ -1,0 +1,50 @@
+# Main metainfo
+log_save_dir: './drive/MyDrive/skoltech/exp_9/lightning_logs'
+
+model_checkpoint: null
+model_checkpoint_callback__monitor: ['a_psnr', 'a_ssim']
+model_checkpoint_callback__save_top_k: 5
+model_checkpoint_callback__mode: 'max'
+composer: TTSRLitComposer
+
+trainer__kwargs:
+  max_epochs: 2
+  accelerator: 'dp'
+
+# Model
+model: 'TTSR'
+model__kwargs:
+  n_feats: 64
+  num_res_blocks: 16+16+8+4
+  res_scale: 1.
+
+# Training
+batch_size: 9
+loss: 'rec'
+
+optimizer: Adam
+lr:
+  MainNet: !!float 1e-4
+  LTE: !!float 1e-5
+optimizer__kwargs: 
+  betas: [0.9, 0.999]
+  eps: !!float 1e-8
+
+lr_scheduler: StepLR
+lr_scheduler__kwargs:
+  step_size: 999999
+  gamma: .5
+
+# Datasets
+train_dataset: 'CufedTrainDataset'
+train_num_workers: 4
+train_dataset__kwargs:
+  dataset_dirpath: './CUFED/train'
+  add_input_noise_wsigma: 0.25
+
+val_dataset: 'CufedTestDataset'
+val_num_workers: 2
+val_dataset__kwargs:
+  dataset_dirpath: './CUFED/test'
+  add_input_noise_wsigma: 0.25
+  random_seed: 42
