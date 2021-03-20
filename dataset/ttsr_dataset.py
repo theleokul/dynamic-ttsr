@@ -203,7 +203,7 @@ class CufedTestDataset(Dataset):
                 torch.manual_seed(self.random_seed)  # Same noise for each validation element
                 self._noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].shape)
 
-            sample['LR'] += self._noise
+            sample['LR'] += F.interpolate(self._noise.unsqueeze(0), sample['LR'].shape[-2:], mode='bicubic').squeeze(0)
             sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].shape[-2:], mode='bicubic').squeeze(0)
 
         return sample
