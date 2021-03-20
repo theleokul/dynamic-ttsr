@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
-import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, LTE, SearchTransfer
+import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, MainNet_exp_6, LTE, SearchTransfer
 
 
 class TTSR(nn.Module):
@@ -41,6 +41,13 @@ class TTSR(nn.Module):
         elif experiment == '8':
             print('Running experiment 8...')
             self.MainNet = MainNet_exp_8.MainNet(
+                num_res_blocks=self.num_res_blocks
+                , n_feats=n_feats 
+                , res_scale=res_scale
+            )
+        elif experiment == '6':
+            print('Running experiment 6...')
+            self.MainNet = MainNet_exp_6.MainNet(
                 num_res_blocks=self.num_res_blocks
                 , n_feats=n_feats 
                 , res_scale=res_scale
