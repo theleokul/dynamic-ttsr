@@ -128,9 +128,9 @@ class CufedTrainDataset(Dataset):
             sample = self.transform(sample)
 
         if self.add_input_noise_wsigma is not None:
-            noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].size)
+            noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].shape)
             sample['LR'] += noise
-            sample['LR_sr'] += F.interpolate(noise.unsqueeze(0), sample['LR_sr'].size, mode='bicubic').squeeze(0)
+            sample['LR_sr'] += F.interpolate(noise.unsqueeze(0), sample['LR_sr'].shape, mode='bicubic').squeeze(0)
 
         return sample
 
@@ -201,9 +201,9 @@ class CufedTestDataset(Dataset):
         if self.add_input_noise_wsigma is not None:
             if self._noise is None:
                 torch.manual_seed(self.random_seed)  # Same noise for each validation element
-                self._noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].size)
+                self._noise = self.add_input_noise_wsigma * torch.randn(sample['LR'].shape)
 
             sample['LR'] += self._noise
-            sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].size, mode='bicubic').squeeze(0)
+            sample['LR_sr'] += F.interpolate(self._noise.unsqueeze(0), sample['LR_sr'].shape, mode='bicubic').squeeze(0)
 
         return sample
