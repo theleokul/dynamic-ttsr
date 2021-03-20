@@ -7,6 +7,7 @@ import numpy as np
 import cv2
 import torch
 import kornia as K
+import imageio
 
 ROOT_PATH = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_PATH))
