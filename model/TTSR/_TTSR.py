@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
-import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, MainNet_exp_6, LTE, SearchTransfer
+import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, MainNet_exp_6_1, LTE, SearchTransfer, SearchTransfer_exp_6_2
 
 
 class TTSR(nn.Module):
@@ -45,9 +45,9 @@ class TTSR(nn.Module):
                 , n_feats=n_feats 
                 , res_scale=res_scale
             )
-        elif experiment == '6':
-            print('Running experiment 6...')
-            self.MainNet = MainNet_exp_6.MainNet(
+        elif experiment == '6_1':
+            print('Running experiment 6_1...')
+            self.MainNet = MainNet_exp_6_1.MainNet(
                 num_res_blocks=self.num_res_blocks
                 , n_feats=n_feats 
                 , res_scale=res_scale
@@ -61,7 +61,12 @@ class TTSR(nn.Module):
 
         self.LTE      = LTE.LTE(requires_grads=LTE_requires_grads)
         self.LTE_copy = LTE.LTE(requires_grads=[False, False, False]) ### used in transferal perceptual loss
-        self.SearchTransfer = SearchTransfer.SearchTransfer()
+
+        if experiment == '6_2':
+            print('Running experiment 6_2...')
+            self.SearchTransfer = SearchTransfer_exp_6_2.SearchTransfer()
+        else:
+            self.SearchTransfer = SearchTransfer.SearchTransfer()
 
     def forward(self, lr=None, lrsr=None, ref=None, refsr=None, sr=None, meta=None):
         if (type(sr) != type(None)):
