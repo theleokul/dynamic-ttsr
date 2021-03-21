@@ -1,0 +1,10 @@
+# model_checkpoint: './drive/MyDrive/skoltech/exp_3_1/lightning_logs/version_1/checkpoints/epoch=47-a_psnr=25.3215-a_ssim=0.7551.ckpt'
+composer: FullTTSRLitComposer
+output_dir: './drive/MyDrive/skoltech/exp_6/output'
+# modes: test
+modes: predict
+
+test_dataset: 'CufedTestDataset'
+test_dataset__kwargs:
+  # dataset_dirpath: '/trinity/home/l.kulikov/data/cufed/test'
+  dataset_dirpath: './CUFED/test'
