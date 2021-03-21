@@ -12,8 +12,8 @@ def rbf_bmm(x, y, gamma=1.):
     # x [N, H*W, C*k*k]
     # y [N, C*k*k, H*W]
 
-    res = torch.empty(x.size(0), x.size(1), y.size(1), dtype=x.dtype, device=x.device, requires_grad=x.requires_grad)
-    # y = y.transpose(1, 2)
+    res = torch.empty(x.size(0), x.size(1), y.size(2), dtype=x.dtype, device=x.device, requires_grad=x.requires_grad)
+    y = y.transpose(1, 2)
 
     for b in range(res.size(0)):
         for i in range(res.size(1)):
@@ -45,14 +45,17 @@ class SearchTransfer(nn.Module):
         ### search
         lrsr_lv3_unfold  = F.unfold(lrsr_lv3, kernel_size=(3, 3), padding=1)  # [N, C*k*k, H*W]
         refsr_lv3_unfold = F.unfold(refsr_lv3, kernel_size=(3, 3), padding=1)  # [N, C*k*k, H*W]
-        # refsr_lv3_unfold = refsr_lv3_unfold.permute(0, 2, 1)  # [N, H*W, C*k*k]
+        refsr_lv3_unfold = refsr_lv3_unfold.permute(0, 2, 1)  # [N, H*W, C*k*k]
 
-        # refsr_lv3_unfold = F.normalize(refsr_lv3_unfold, dim=2) # [N, Hr*Wr, C*k*k]
-        refsr_lv3_unfold = F.normalize(refsr_lv3_unfold, dim=1) # [N, Hr*Wr, C*k*k]
+        refsr_lv3_unfold = F.normalize(refsr_lv3_unfold, dim=2) # [N, Hr*Wr, C*k*k]
+        # refsr_lv3_unfold = F.normalize(refsr_lv3_unfold, dim=1) # [N, Hr*Wr, C*k*k]
         lrsr_lv3_unfold  = F.normalize(lrsr_lv3_unfold, dim=1) # [N, C*k*k, H*W]
 
         # R_lv3 = torch.bmm(refsr_lv3_unfold, lrsr_lv3_unfold) #[N, H*W, H*W]
         R_lv3 = rbf_bmm(refsr_lv3_unfold, lrsr_lv3_unfold, self.gamma)  #[N, H*W, H*W]
+
+        # import ipdb; ipdb.set_trace()
+
         # R_lv3_star - SOFT ATTENTION MAP, R_lv3_star_arg - HARD ATTENTION MAP
         R_lv3_star, R_lv3_star_arg = torch.max(R_lv3, dim=1) #[N, H*W]
 
