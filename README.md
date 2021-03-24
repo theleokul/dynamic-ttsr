@@ -107,7 +107,7 @@ python main.py --config config/test/exp_{x}/ttsr_colab.yml \
     -O 'path/to/where/save/predicted/images'
 ```
 
-### Get predictions on validation dataset
+### Test on validation dataset
 ```bash
 # Npte that test configs are unified (e.x. instead of exp_3_1 just exp_3)
 python main.py --config config/test/exp_{x}/ttsr_colab.yml \
