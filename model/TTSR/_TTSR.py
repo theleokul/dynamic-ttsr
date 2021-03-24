@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 DIR_PATH = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(DIR_PATH))
-import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, MainNet_exp_6_1, LTE, SearchTransfer, SearchTransfer_exp_6_2
+import MainNet, MainNet_exp_3_1, MainNet_exp_3_2, MainNet_exp_8, MainNet_exp_6_1, LTE, SearchTransfer
 
 
 class TTSR(nn.Module):
