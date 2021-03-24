@@ -104,6 +104,7 @@ python main.py --config train-suite/config/test/exp_{x}/ttsr_colab.yml \
 
 ### Get predictions on validation dataset
 ```bash
+# Npte that test configs are unified (e.x. instead of exp_3_1 just exp_3)
 python main.py --config train-suite/config/test/exp_{x}/ttsr_colab.yml \
     -g 0 \
     --modes test \
