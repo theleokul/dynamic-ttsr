@@ -14,6 +14,8 @@ All the details about experiments that were provided on **TTSR** are explained i
 
 [Video presentation](https://drive.google.com/file/d/1g2RRHqYdGptNbvBOIv6LPKDkyWhiRsUe/view?usp=sharing)
 
+[Google Drive with all the results we obtained](https://drive.google.com/drive/folders/1m3XDS7lHJmz9uIY0TgAD1V-tX-oHVeyR?usp=sharing)
+
 ## Prerequisites
 
 * pytorch
@@ -79,40 +81,49 @@ After all setup is done. You should run three comands to reproduce experiment `x
 ### Pretraining for 2 epochs (~10min on Nvidia V100)
 
 ```bash
-python main.py --config onfig/train/exp_{x}/ttsr_warmup_colab.yml \  # Do not forget to put a number instead of x
-    -g 0 \  # GPU number on you system
+# Do not forget to put a number instead of x
+python main.py --config config/train/exp_{x}/ttsr_warmup_colab.yml \
+    -g 0 \ 
     -L 'logs'  # Path for logs and checkpoints
 ```
 
 ### Fine-tuning for 50 epochs (~10hours on Nvidia V100)
 
 ```bash
-python main.py --config onfig/train/exp_{x}/ttsr_colab.yml \  # Do not forget to put a number instead of x
-    -g 0 \  # GPU number on you system
-    -b 'path/to/pretrained/checkpoint' \  # Obtained during the pretraining (checkpoints are saved in the logs directory)
+# Do not forget to put a number instead of x
+# -b: Obtained during the pretraining (checkpoints are saved in the logs directory)
+python main.py --config config/train/exp_{x}/ttsr_colab.yml \ 
+    -g 0 \ 
+    -b 'path/to/pretrained/checkpoint' \ 
     -L 'logs'  # Path for logs and checkpoints
 ```
 
 ### Get predictions on validation dataset
 ```bash
-python main.py --config train-suite/config/test/exp_{x}/ttsr_colab.yml \
+python main.py --config config/test/exp_{x}/ttsr_colab.yml \
     -g 0 \
     --modes predict \
     -m 'path/to/finetuned/checkpoint' \
-    -O 'path/to/predicted/images'
+    -O 'path/to/where/save/predicted/images'
 ```
 
 ### Get predictions on validation dataset
 ```bash
 # Npte that test configs are unified (e.x. instead of exp_3_1 just exp_3)
-python main.py --config train-suite/config/test/exp_{x}/ttsr_colab.yml \
+python main.py --config config/test/exp_{x}/ttsr_colab.yml \
     -g 0 \
     --modes test \
-    -m 'path/to/finetuned/checkpoint' \
+    -m 'path/to/finetuned/checkpoint'
+```
+
+### (Optional) Plot the training losses with Tensorboard
+
+```bash
+tensorboard --logdir path/to/logs
 ```
 
 > To train the TTSR on the original pipeline, just follow the guide from the authors repository.
-> Experiment 10 was provided on the original pipeline, you can follow their instructions (but just use a black reference frame to reproduce the result)
+> Experiment 10 was provided on the original pipeline, you can follow their instructions (but just use a black reference frame to reproduce the result). We also prepared a guide in `exp_10.ipynb`.
 
 ## Highlighted results
 
