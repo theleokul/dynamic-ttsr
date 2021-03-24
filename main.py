@@ -33,6 +33,7 @@ parser.add_argument('-b', '--baseline-checkpoint', type=str, default=None)
 parser.add_argument('-m', '--model-checkpoint', type=str, default=None)
 parser.add_argument('--modes', type=str, default=None)
 parser.add_argument('-O', '--output-dirpath', type=str, default=None)
+parser.add_argument('-L', '--log-save-dir', type=str, default=None)
 
 args = parser.parse_args()
 config = {}
@@ -53,13 +54,19 @@ def main():
     output_dirpath = config.get('output_dir', './output')
     if args.output_dirpath is not None:
         output_dirpath = args.output_dirpath
+        config['output_dirpath'] = output_dirpath
 
     log_save_dir = config.get('log_save_dir', './logs')
+    if args.log_save_dir is not None:
+        log_save_dir = args.log_save_dir
+        config['log_save_dir'] = log_save_dir
+
     trainer__kwargs = config.get('trainer__kwargs', {})
     
     model_checkpoint = config.get('model_checkpoint', None)
     if args.model_checkpoint is not None:
         model_checkpoint = args.model_checkpoint
+        config['model_checkpoint'] = model_checkpoint
 
     model_checkpoint_callback__monitor = config.get('model_checkpoint_callback__monitor', ['avg_val_loss'])
     model_checkpoint_callback__save_top_k = config.get('model_checkpoint_callback__save_top_k', 1)
@@ -76,6 +83,7 @@ def main():
     baseline_checkpoint = config.get('baseline_checkpoint', None)
     if args.baseline_checkpoint is not None:
         baseline_checkpoint = args.baseline_checkpoint
+        config['baseline_checkpoint'] = baseline_checkpoint
 
     if baseline_checkpoint is not None:
         print(f'Loaded: {baseline_checkpoint}')
