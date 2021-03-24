@@ -5,6 +5,7 @@ model_checkpoint_callback__monitor: ['a_psnr', 'a_ssim']
 model_checkpoint_callback__save_top_k: 55
 model_checkpoint_callback__mode: 'max'
 model_checkpoint: './drive/MyDrive/skoltech/train_suite_ttsr_orig/version_2/checkpoints/epoch=27-a_psnr=25.1985-a_ssim=0.7553.ckpt'
+baseline_composer: TTSRLitComposer
 composer: FullTTSRLitComposer
 
 trainer__kwargs:

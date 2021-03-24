@@ -12,6 +12,8 @@ We have also provided rigorous analysis and came up with an advancement (injecti
 
 All the details about experiments that were provided on **TTSR** are explained in the `report.pdf`.
 
+[Video presentation](https://drive.google.com/file/d/1g2RRHqYdGptNbvBOIv6LPKDkyWhiRsUe/view?usp=sharing)
+
 ## Prerequisites
 
 * pytorch
@@ -77,7 +79,8 @@ After all setup is done. You should run three comands to reproduce experiment `x
 ### Pretraining for 2 epochs (~10min on Nvidia V100)
 
 ```bash
-python main.py --config onfig/train/exp_{x}/ttsr_warmup_colab.yml -g 0 \  # Do not forget to put a number instead of x
+python main.py --config onfig/train/exp_{x}/ttsr_warmup_colab.yml \  # Do not forget to put a number instead of x
+    -g 0 \  # GPU number on you system
     -L 'logs'  # Path for logs and checkpoints
 ```
 
@@ -108,6 +111,7 @@ python main.py --config train-suite/config/test/exp_{x}/ttsr_colab.yml \
 ```
 
 > To train the TTSR on the original pipeline, just follow the guide from the authors repository.
+> Experiment 10 was provided on the original pipeline, you can follow their instructions (but just use a black reference frame to reproduce the result)
 
 ## Highlighted results
 
